@@ -1,6 +1,6 @@
 <?php
 require_once 'Colors.php';
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+require_once __DIR__ . '/../options_mysql.php';
 class Mysql {
     private $con;
     private $commit;
@@ -56,7 +56,7 @@ class Mysql {
                 mysqli_commit($this->con);
                 $this->sql($query_add_in_table_new_raw_about_migrations);
             } catch (mysqli_sql_exception $exception) {
-                var_dump("in catch");
+                echo $this->colors->getColoredString("ERROR!!!!!\n", 'white', 'red');
                 mysqli_rollback($this->con);
                 throw $exception;
             }
@@ -69,7 +69,7 @@ class Mysql {
         $this->files = scandir($dir, SCANDIR_SORT_NONE);
         $this->files = array_diff($this->files, ['..', '.']);
     }
-
+    #меняет число в отрицательное число
     private function neg1($num){
 	return $num < 0 ? $num : -1*$num;
     }
@@ -186,8 +186,5 @@ class Mysql {
     }
 
 }
-
-$mysql = new Mysql();
-$mysql->job();
 
 ?>
