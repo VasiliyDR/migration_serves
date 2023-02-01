@@ -39,6 +39,9 @@ class Mysql {
     
 
     private function addMigrationTable() {
+        #соритруем массив
+        asort($this->changeMigFiles);
+
         foreach ($this->changeMigFiles as $key => $values) {
             
             include_once "./migrations_tables/{$values}";  // подключаем файлы миграции ($values это название файла)
@@ -46,18 +49,19 @@ class Mysql {
             // $this->sql($query_1);
             // $this->sql($sql_migrations); // выполняется запрос из файла миграции
             $array_sql_query = explode('|', $sql_migrations);
+            // var_dump($array_sql_query);
+            // exit;
 
             mysqli_begin_transaction($this->con);
-
             try {
                 for($i=0;$i<count($array_sql_query); $i++) {
-                    $this->sql($array_sql_query[$i]);
-                }
+                    mysqli_query($this->con, $array_sql_query[$i]);
+                }  
                 mysqli_commit($this->con);
-                $this->sql($query_add_in_table_new_raw_about_migrations);
+                $this->sql($query_add_in_table_new_raw_about_migrations); 
             } catch (mysqli_sql_exception $exception) {
-                echo $this->colors->getColoredString("ERROR!!!!!\n", 'white', 'red');
                 mysqli_rollback($this->con);
+                echo $this->colors->getColoredString("ERROR!!!!!\n", 'white', 'red');
                 throw $exception;
             }
         }
@@ -100,6 +104,10 @@ class Mysql {
             $space_file_name .= ' ';
         }
         $file_name = $space_file_name . "file_name"  . $space_file_name;
+        if(mb_strlen($file_name) > ($this->file_name_length + 2)) {
+            $res = mb_strlen($file_name) - ($this->file_name_length + 2);
+            $file_name = substr($file_name, 0, $this->neg1($res));
+        }
         $num2 = $this->commit_length - 6;
         $num2 = ceil($num2 / 2);
         if($num2 % 2 != 0) {
@@ -168,7 +176,7 @@ class Mysql {
             $n = 0;
         }
 
-        $header = "{$this->colors->getColoredString("Миграция прошла успешно\n", 'white', 'green')}|{$this->colors->getColoredString($file_name, 'red','purple')}|{$this->colors->getColoredString($commit, 'white','black')}|{$this->colors->getColoredString('     data_create     ', 'green','blue')}|\n";
+        $header = "Миграция прошла успешно\n|{$this->colors->getColoredString($file_name, 'red','purple')}|{$this->colors->getColoredString($commit, 'white','black')}|{$this->colors->getColoredString('     data_create     ', 'green','blue')}|\n";
         echo $header . $this->str;
     }
 
@@ -184,7 +192,6 @@ class Mysql {
         }
 
     }
-
 }
 
 ?>
