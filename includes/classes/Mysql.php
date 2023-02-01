@@ -27,6 +27,12 @@ class Mysql {
         $result = mysqli_query($this->con, $text);
         return $result;
     }
+
+    private function createMigrationTableIfNoExists() {
+        $q = "CREATE TABLE IF NOT EXISTS db_olliver.migrations_table (id INT AUTO_INCREMENT PRIMARY KEY, file_name VARCHAR(100), commit VARCHAR(100), data_create DATETIME DEFAULT CURRENT_TIMESTAMP);";
+        $this->sql($q);
+    }
+
     private function selectMigrationsTable() {
         $query = $this->sql("SELECT file_name FROM db_olliver.migrations_table; ");
         if(mysqli_num_rows($query) > 0) {
@@ -181,6 +187,7 @@ class Mysql {
     }
 
     public function job(){
+        $this->createMigrationTableIfNoExists(); # если табличка куда фиксируются какие миграции были сделаны отсутствует то табличка создаётся, если она есть тогда создание пропускается
         $this->selectMigrationsTable(); // Выводит какие миграции уже есть 
         $this->filesMigrations();  // выводит какие файлы есть для миграции
         $this->changeMigFiles = array_diff($this->files, $this->selectMigrations);  // сохранит в переменную массив с файлами которые надо накатить
