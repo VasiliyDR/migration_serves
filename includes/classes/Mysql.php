@@ -17,7 +17,7 @@ class Mysql {
     private $arr = array();
 
     public function __construct() {
-        $this->con = mysqli_connect("mysql_db", "root", "root", "db_olliver") or die(mysqli_connect_error());
+        $this->con = mysqli_connect("127.0.0.1", "test_web", "RthfkYfer54!", "db_olliver") or die(mysqli_connect_error());
         mysqli_query($this->con,'SET NAMES "utf8"');
         mysqli_query($this->con,"SET lc_time_names = 'ru_RU';");
         $this->colors = new Colors();
